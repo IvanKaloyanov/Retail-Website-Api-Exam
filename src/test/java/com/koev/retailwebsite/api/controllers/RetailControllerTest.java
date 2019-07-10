@@ -25,7 +25,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -72,7 +72,7 @@ public class RetailControllerTest {
         String payload = objectMapper.writeValueAsString(purchases);
 
         MvcResult result = mockMvc.perform(
-                put(String.format("%s", API_PREFIX) + "/discounts").contentType("application/json")
+                post(String.format("%s", API_PREFIX) + "/discounts").contentType("application/json")
                         .content(payload))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -89,7 +89,7 @@ public class RetailControllerTest {
         String payload = "some wrong payload";
 
         MvcResult result = mockMvc.perform(
-                put(String.format("%s", API_PREFIX + "/discounts")).contentType("application/json")
+                post(String.format("%s", API_PREFIX + "/discounts")).contentType("application/json")
                         .content(payload))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
