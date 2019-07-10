@@ -17,6 +17,7 @@ The Retail Website API project is written in Java and the API is based on the Sp
 
 
 # UML Diagram
+![Retail (2)](https://user-images.githubusercontent.com/16307530/60998741-3acac300-a362-11e9-93de-5fcff4137b4e.png)
 
 ## Build
 In order to start the application perform the following steps:
