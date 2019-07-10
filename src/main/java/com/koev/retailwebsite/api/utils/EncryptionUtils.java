@@ -1,4 +1,4 @@
-package com.koev.retailwebsite.api.condig;
+package com.koev.retailwebsite.api.utils;
 
 import com.koev.retailwebsite.api.RetailWebsiteApiApplication;
 import org.springframework.context.annotation.Bean;
@@ -9,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @ComponentScan(basePackageClasses = RetailWebsiteApiApplication.class)
-public class EncryptionConfig {
+public class EncryptionUtils {
 
     /**
      * Bean for injecting PasswordEncoder instances

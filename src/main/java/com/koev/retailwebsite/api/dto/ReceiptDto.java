@@ -1,23 +1,17 @@
 package com.koev.retailwebsite.api.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Receipt representation
  */
 @Data
+@AllArgsConstructor
 public class ReceiptDto {
-
-    public ReceiptDto() {
-    }
-
-    public ReceiptDto(BillDto order, BigDecimal totalPrice) {
-        this.order = new BillDto(order.getPurchaseDto());
-        this.totalPrice = totalPrice;
-    }
-
-    private BillDto order;
+    private List<PurchaseDto> purchases;
     private BigDecimal totalPrice;
 }

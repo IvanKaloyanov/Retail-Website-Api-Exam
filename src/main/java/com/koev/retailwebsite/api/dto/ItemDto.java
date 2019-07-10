@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 public class ItemDto {
 
     public enum ItemType {
+        TECH,
         GROCERY,
         CLOTHES,
         OTHER,
@@ -32,5 +33,6 @@ public class ItemDto {
     @NotNull
     private ItemType itemType;
 
+    @NotNull
     private String description;
 }

@@ -2,7 +2,6 @@ package com.koev.retailwebsite.api.services;
 
 import com.koev.retailwebsite.api.discounts.BasicTotalDiscount;
 import com.koev.retailwebsite.api.dto.ItemDto;
-import com.koev.retailwebsite.api.dto.OrderDtop;
 import com.koev.retailwebsite.api.dto.PurchaseDto;
 import com.koev.retailwebsite.api.dto.ReceiptDto;
 import com.koev.retailwebsite.api.enums.DiscountRoles;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * {@link RetailService} implementation
@@ -32,21 +32,20 @@ public class RetailServiceImpl implements RetailService {
     public RetailServiceImpl(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
 
-        blacklistedForDiscounts = new HashSet<>();
+        this.blacklistedForDiscounts = new HashSet<>();
         // Add black listed ItemDto Types
-        blacklistedForDiscounts.add(ItemDto.ItemType.GROCERY);
+        this.blacklistedForDiscounts.add(ItemDto.ItemType.GROCERY);
 
-        numericDiscounts = new ArrayList<>();
+        this.numericDiscounts = new ArrayList<>();
         // Add all kind of strange discounts for the total billDto
         // based on whatever you want (Date, time, odd, even...)
-        numericDiscounts.add(new BasicTotalDiscount(100, 5));
+        this.numericDiscounts.add(new BasicTotalDiscount(100, 5));
     }
 
     @Override
-    public ReceiptDto calculateBill(OrderDtop orderDtop, String username) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        BigDecimal total = orderDtop.getBillDto().getPurchaseDto().stream().
-                map(i -> i.getItemDto().getPrice().multiply(
+    public ReceiptDto calculateBill(List<PurchaseDto> purchases, UserDetails userDetails) {
+        BigDecimal total = purchases.stream().
+                map(i -> i.getItem().getPrice().multiply(
                         new BigDecimal(i.getCount())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -54,11 +53,11 @@ public class RetailServiceImpl implements RetailService {
 
         Integer percentageDiscount = getDiscountFromRoles(userDetails.getAuthorities());
 
-        BigDecimal totalPrice = orderDtop.getBillDto().getPurchaseDto().stream().
+        BigDecimal totalPrice = purchases.stream().
                 map(i -> applyPurchasePercentageDiscount(i, percentageDiscount))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return new ReceiptDto(orderDtop.getBillDto(), totalPrice.subtract(fixedDiscount));
+        return new ReceiptDto(purchases, totalPrice.subtract(fixedDiscount));
     }
 
     /**
@@ -70,9 +69,9 @@ public class RetailServiceImpl implements RetailService {
      */
     private BigDecimal applyPurchasePercentageDiscount(PurchaseDto purchaseDto, Integer percentage) {
 
-        BigDecimal normalPrice = purchaseDto.getItemDto().getPrice().multiply(
+        BigDecimal normalPrice = purchaseDto.getItem().getPrice().multiply(
                 new BigDecimal(purchaseDto.getCount()));
-        if (isItemTypeBlacklisted(purchaseDto.getItemDto().getItemType())) {
+        if (isItemTypeBlacklisted(purchaseDto.getItem().getItemType())) {
             return normalPrice;
         }
 
@@ -111,11 +110,15 @@ public class RetailServiceImpl implements RetailService {
      * @return {@link Integer} the highest percentage discount based on user's roles
      */
     private Integer getDiscountFromRoles(Collection<? extends GrantedAuthority> authorities) {
-        if (authorities.contains(DiscountRoles.EMPLOYEE.name()))
+
+        Set<String> userRoles = authorities.stream().map(
+                GrantedAuthority::getAuthority).collect(Collectors.toSet());
+
+        if (userRoles.contains(DiscountRoles.EMPLOYEE.name()))
             return DiscountRoles.EMPLOYEE.percentageDiscount;
-        if (authorities.contains(DiscountRoles.AFFILIATE.name()))
+        if (userRoles.contains(DiscountRoles.AFFILIATE.name()))
             return DiscountRoles.AFFILIATE.percentageDiscount;
-        if (authorities.contains(DiscountRoles.LOYAL.name()))
+        if (userRoles.contains(DiscountRoles.LOYAL.name()))
             return DiscountRoles.LOYAL.percentageDiscount;
         return 0;
     }

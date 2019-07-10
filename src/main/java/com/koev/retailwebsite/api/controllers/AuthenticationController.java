@@ -1,10 +1,8 @@
 package com.koev.retailwebsite.api.controllers;
 
 import com.koev.retailwebsite.api.dto.AuthDto;
-import com.koev.retailwebsite.api.dto.OrderDtop;
 import com.koev.retailwebsite.api.dto.UserDto;
 import com.koev.retailwebsite.api.services.interfaces.AuthService;
-import com.koev.retailwebsite.api.services.interfaces.RetailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;

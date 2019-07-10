@@ -1,6 +1,6 @@
 package com.koev.retailwebsite.api.controllers;
 
-import com.koev.retailwebsite.api.dto.OrderDtop;
+import com.koev.retailwebsite.api.dto.PurchaseDto;
 import com.koev.retailwebsite.api.dto.ReceiptDto;
 import com.koev.retailwebsite.api.services.interfaces.RetailService;
 import org.springframework.http.MediaType;
@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/purchases")
+@RequestMapping("/api/v1/retail")
 public class RetailController {
 
     private final RetailService retailService;
@@ -32,12 +33,12 @@ public class RetailController {
     /**
      * Endpoint for calculating the billDto
      *
-     * @param orderDtop {@link OrderDtop} the orderDtop made
+     * @param purchases {@link List<PurchaseDto>} the bill made
      */
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ReceiptDto> calculateBill(@Valid @RequestBody OrderDtop orderDtop,
+    @PutMapping(path = "discounts", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ReceiptDto> calculateBill(@Valid @RequestBody List<PurchaseDto> purchases,
                                                     @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(retailService.calculateBill(orderDtop, userDetails.getUsername()));
+        return ResponseEntity.ok(retailService.calculateBill(purchases, userDetails));
 
     }
 }
